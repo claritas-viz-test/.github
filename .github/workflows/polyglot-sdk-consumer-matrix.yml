@@ -1,0 +1,19 @@
+name: Polyglot SDK consumer matrix
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [clients-repository-ready, clients-updated]
+
+permissions:
+  contents: read
+
+jobs:
+  sdk-clients:
+    uses: zed-pkg-test/.github/.github/workflows/sdk-client-language-matrix.yml@ad6b6a3e53958d2d2571a45d711d0263bbcce985
+    with:
+      clients_repository: claritas-viz/claritas-clients
+      clients_ref: main
+      clients_root: clients
+    secrets:
+      read_token: ${{ secrets.TEST_ORG_READ_TOKEN }}
