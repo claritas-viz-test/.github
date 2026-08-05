@@ -17,3 +17,13 @@ Visualization SDK, API, rendering, export, Flutter/web UI, accessibility, and la
 | `export-accessibility` | UI/accessibility | `ready` | `matrix` |
 
 Pull requests run deterministic harness checks. Emulators, desktop matrices, live APIs/providers, databases, chaos, scale, and soaks are scheduled/manual. Missing upstreams or credentials are blocked readiness—not false passes or product regressions.
+
+<!-- org-project-routing:start -->
+## Planning and delivery
+
+- [GitHub Project: claritas-viz-test-project](https://github.com/orgs/claritas-viz-test/projects/1)
+- [Linear planning project](https://linear.app/denman/project/githubcomclaritas-viz-test-be061b785d84)
+- [Detailed project-routing contract](../docs/PROJECTS.md)
+
+GitHub owns code and delivery evidence; Linear owns planning and dependencies. The linked organization Project provides the cross-repository execution view.
+<!-- org-project-routing:end -->
