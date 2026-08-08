@@ -1,6 +1,7 @@
 use std::process::ExitCode;
 
-const HELP: &str = "claritas-portable-rust-cli 0.1.0\n\nUsage: claritas-portable-rust-cli [--help]\n";
+const HELP: &str =
+    "claritas-portable-rust-cli 0.1.0\n\nUsage: claritas-portable-rust-cli [--help]\n";
 
 fn run<I>(argv: I) -> Result<&'static str, &'static str>
 where
