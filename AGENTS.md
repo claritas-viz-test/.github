@@ -1,21 +1,66 @@
-# Organization agent policy
+# Organization-wide agent instructions
 
-These instructions apply to automation and coding agents working in `claritas-viz-test` repositories unless a repository defines stricter local policy.
+<!-- ore-org-baseline:begin -->
+These instructions apply to this repository. Repository-local instructions may add stricter requirements, but they must not weaken this baseline.
 
-## Durable engineering policy
+## Canonical organization links
 
-- This repository defines public organization-wide defaults for `claritas-viz-test`.
-- Never commit credentials, private keys, access tokens, customer data, or private-repository inventories.
-- Resolve Git conflicts semantically: inspect both sides, the merge base, nearby tests and contracts, and normally 3–10 relevant prior commits. Never blindly select all of `ours` or all of `theirs`.
-- Prefer focused pull requests, explicit validation, non-destructive Git operations, and documented tradeoffs.
-- Cross-repository integration uses versioned interfaces, APIs, SDKs, events, or explicitly owned replicated read models. Services do not reach into another service's database by default.
-- `*-infra` repositories and `*-monorepo` application source remain separate. A `*-infra` repository must never appear as a Git submodule under `*-monorepo/apps`.
-- Git submodules are reserved for explicitly coordinated editable source composition. Zed packages or immutable artifacts are preferred for package dependencies. Production deploys immutable artifacts or OCI digests, not source clones.
+- GitHub organization: https://github.com/claritas-viz-test
+- Public organization defaults: https://github.com/claritas-viz-test/.github
+- Canonical Linear project: https://linear.app/denman/project/githubcomclaritas-viz-test-be061b785d84
+- Fleet tracking issue: https://github.com/ORESoftware/k8s-cluster/issues/1222
 
-## Required workflow
+## Instruction discovery
 
-1. Read repository-local instructions and relevant contracts before editing.
-2. Inspect affected tests and 3–10 relevant commits when history is material.
-3. Keep changes scoped and do not overwrite stronger local policy.
-4. Run the most relevant formatter, linter, tests, and secret scan available.
-5. Report exactly what changed, what was validated, and remaining uncertainty.
+Lowercase `agents.md` is canonical. Read every applicable lowercase `agents.md` from the repository root toward the current working directory before editing. Uppercase `AGENTS.md` and provider-specific instruction files are compatibility mirrors and must remain aligned with the applicable lowercase policy.
+
+## Inspect before editing
+
+Inspect the current branch, complete working tree, remotes, default branch, open pull requests, linked GitHub issues, linked Linear work, repository documentation, tests, schemas, generated artifacts, deployment definitions, and relevant related repositories. Preserve every unfamiliar or uncommitted change.
+
+Use read-only inspection and non-pruning synchronization such as `git status --short --branch`, `git remote -v`, `git fetch --all`, `git diff`, `git log`, `git show`, and `git blame`. Never treat a dirty worktree or inconvenient branch as permission to discard state.
+
+## Mandatory semantic conflict resolution
+
+> resolve any and all git conflicts semantically, will full context, even looking back 3-10 commits in git log history for more context - never hastily pick sides in a conflict but merge things conceptually, using max context and complete conceptual awareness for a given github organization's repos and external org repos too
+
+For every conflict:
+
+1. Read the merge base, both complete sides, surrounding implementation, tests, schemas, generated artifacts, documentation, deployment configuration, and public contracts—not only conflict markers.
+2. Inspect the affected path history and normally review 3–10 relevant commits on each side with `git log`, `git show`, and `git blame` where useful.
+3. Review linked pull requests, issues, Linear work, related repositories in `claritas-viz-test`, and relevant external-organization repositories whenever behavior or contracts cross boundaries.
+4. Preserve compatible intent and invariants from both sides. Synthesize a conceptual merge; never resolve by selecting `ours`, `theirs`, `current`, or `incoming` wholesale.
+5. Scan the complete tree for unresolved markers and run the applicable formatter, linter, unit, integration, contract, build, security, and end-to-end checks.
+6. Document incompatible requirements, intentional choices, and any discarded intent in the commit and pull-request description.
+
+## Hard denylist for automated agents
+
+Automated agents must **never execute or recommend** destructive, state-concealing, history-rewriting, purge, revocation, or policy-bypass operations. This is a hard denylist: authorization may support a reviewed human-run procedure, but it does not authorize an automated agent to perform the destructive step.
+
+The blacklist includes, without limitation:
+
+- every form of `git stash`, every mode of `git reset`, every mode of `git clean`, `git filter-repo`, `git filter-branch`, BFG, `git rebase`, interactive history rewriting, `git commit --amend`, commit replacement, destructive `git checkout -- <path>`, destructive `git restore`, `git branch -D`, ref or tag deletion, `git reflog expire`, `git gc --prune`, `git push --force`, and `git push --force-with-lease`;
+- recursive or bulk deletion and destructive filesystem mutation, including `rm -rf`, `find -delete`, truncation, shredding, destructive overwrite, formatting, and access-removing ownership or permission changes;
+- destructive data operations, including `DROP`, `TRUNCATE`, unbounded `DELETE`, destructive rollback, irreversible migration, bucket/object purge, queue/topic deletion, and bulk mutation without a bounded reversible plan;
+- destructive infrastructure or identity operations, including `kubectl delete`, `helm uninstall`, `terraform destroy`, `pulumi destroy`, cloud delete/purge calls, cluster or namespace teardown, and autonomous secret, key, certificate, credential, factor, or session revocation or rotation;
+- deleting repositories, worktrees, submodules, branches, tags, releases, packages, artifacts, registries, environments, evidence, audit logs, customer data, or production state;
+- bypassing hooks, reviews, branch protection, rulesets, required checks, security/compliance gates, approvals, or audit logging, including `--no-verify` and equivalent bypasses.
+
+Do not use destructive commands merely to make tests pass, clear a conflict, simplify a migration, or hide an inconvenient state.
+
+### Required safe alternatives
+
+Use additive branches, separate clean worktrees or clones, explicit path staging, ordinary commits, non-force pushes, patch-based edits, read-only queries, dry runs, backups, additive migrations, and reversible roll-forward changes. Leave unrelated work untouched. When safe progress is impossible, preserve all state and report the exact blocker.
+
+## Source ownership and cross-repository context
+
+Edit authoritative sources rather than generated mirrors, vendored copies, caches, or downstream consumers. Identify generators and regenerate derived artifacts from reviewed sources. Never detach, absorb, relocate, remove, or rewrite a submodule or worktree. Cross-repository behavior must be understood across the owning organization and relevant external organizations before contracts are changed.
+
+## Secrets and sensitive data
+
+Never print, log, commit, paste into issues, include in fixtures, or expose tokens, passwords, private keys, session material, database URLs, customer data, legal records, private health data, production data, or unpublished security details. Use approved secret stores, placeholders, and redacted diagnostics.
+
+## Pull requests, validation, and evidence
+
+Use focused branches and pull requests. Link the relevant Linear issue or project. Explain behavior, risks, migration and roll-forward considerations, security impact, tests run, conflicts and their semantic resolution, and cross-repository dependencies. Never report a branch, commit, pull request, merge, deployment, test run, or external update as complete without authoritative remote evidence.
+<!-- ore-org-baseline:end -->
