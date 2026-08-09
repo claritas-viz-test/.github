@@ -1,3 +1,5 @@
+fixtures/rust-cli/target/
+fixtures/node-cli/node_modules/
 tmp
 temp
 tmp/worktrees
