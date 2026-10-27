@@ -13,7 +13,8 @@ jobs:
     uses: zed-pkg-test/.github/.github/workflows/sdk-client-language-matrix.yml@df3eed96202810b7e7d6667fabc3041b19e6a22f
     with:
       clients_repository: claritas-viz/claritas-clients
-      clients_ref: main
+      # Immutable upstream revision, not a moving branch; update only after reviewing source contracts.
+      clients_ref: ef8dc3e71eabae9c23058ed08162f7af10c38c00
       clients_root: clients
     secrets:
       read_token: ${{ secrets.TEST_ORG_READ_TOKEN }}
