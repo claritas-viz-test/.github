@@ -37,6 +37,11 @@ for (const name of names) {
   }
 }
 
+// Linux can distinguish the two tracked spellings; Windows and default macOS cannot.
+// Enforce the same canonical bytes before Git checks the case-insensitive checkout.
+assert.deepEqual(fs.readFileSync('AGENTS.md'), fs.readFileSync('agents.md'),
+  'uppercase compatibility mirror must match lowercase canonical policy');
+
 const status = runGit(['status', '--porcelain=v1', '--untracked-files=all']);
 if (!isClean(status)) {
   process.stderr.write('CLI validation modified tracked or untracked source:\n');
