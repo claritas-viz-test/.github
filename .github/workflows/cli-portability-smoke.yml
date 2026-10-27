@@ -1,4 +1,4 @@
-name: reusable CLI portability smoke
+name: source-free CLI portability smoke
 
 on:
   pull_request:
@@ -10,6 +10,7 @@ on:
       - '.gitattributes'
       - 'AGENTS.md'
       - 'agents.md'
+      - 'scripts/verify-ci-worktree.cjs'
   workflow_dispatch:
 
 permissions:
@@ -17,19 +18,86 @@ permissions:
 
 jobs:
   rust-cli:
-    uses: ORESoftware/.github/.github/workflows/reusable-cli-portability.yml@a44a422bd2e5a26126488c4dbffb17ed320ae957
-    with:
-      language: rust
-      working-directory: fixtures/rust-cli
-      rust-toolchain: stable
-      cargo-locked: true
-      run-smoke: true
+    name: rust CLI on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    steps:
+      - name: Check out exact caller revision without credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+      - name: Verify clean checkout and LF agent policy
+        run: node scripts/verify-ci-worktree.cjs --self-test
+      - name: Install pinned Rust toolchain action
+        uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Check formatting
+        working-directory: fixtures/rust-cli
+        run: cargo fmt --all -- --check
+      - name: Lint Rust targets
+        working-directory: fixtures/rust-cli
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Run Rust tests
+        working-directory: fixtures/rust-cli
+        run: cargo test --locked --all-targets
+      - name: Build release binary
+        working-directory: fixtures/rust-cli
+        run: cargo build --locked --release --bin claritas-portable-rust-cli
+      - name: Smoke real Rust binary
+        working-directory: fixtures/rust-cli
+        run: cargo run --locked --release --bin claritas-portable-rust-cli -- --help
+      - name: Reject tracked or untracked source mutations
+        if: always()
+        run: node scripts/verify-ci-worktree.cjs
 
   node-cli:
-    uses: ORESoftware/.github/.github/workflows/reusable-cli-portability.yml@a44a422bd2e5a26126488c4dbffb17ed320ae957
-    with:
-      language: node
-      working-directory: fixtures/node-cli
-      node-version: '22'
-      node-package-manager: npm
-      run-smoke: true
+    name: node CLI on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    steps:
+      - name: Check out exact caller revision without credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+      - name: Verify clean checkout and LF agent policy
+        run: node scripts/verify-ci-worktree.cjs --self-test
+      - name: Set up Node 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install committed dependencies
+        working-directory: fixtures/node-cli
+        run: npm ci
+      - name: Check Node CLI formatting
+        working-directory: fixtures/node-cli
+        run: npm run format:check
+      - name: Lint Node CLI
+        working-directory: fixtures/node-cli
+        run: npm run lint
+      - name: Run real Node CLI tests
+        working-directory: fixtures/node-cli
+        run: npm test
+      - name: Build Node CLI
+        working-directory: fixtures/node-cli
+        run: npm run build
+      - name: Smoke real Node CLI
+        working-directory: fixtures/node-cli
+        run: node cli.js --help
+      - name: Reject tracked or untracked source mutations
+        if: always()
+        run: node scripts/verify-ci-worktree.cjs
