@@ -77,7 +77,7 @@ const FIXED_LANE_READINESS = [
   ['java', 'java', true],
   ['golang', 'golang', true],
   ['python3', 'python', true],
-  ['ruby', 'ruby', false],
+  ['ruby', 'ruby', true],
   ['php', 'php', true],
   ['typescript-nodejs', 'nodejs', true],
   ['typescript-deno', 'nodejs', false],
@@ -102,6 +102,21 @@ export function validateLaneReadiness(raw) {
     source_tree_verified: false,
     private_carrier_approved: false,
     provenance: 'source-free, metadata-only spot checks; no native tests executed',
+    manifest_spot_checks: {
+      ruby: {
+        path: 'clients/ruby/claritas-client.gemspec',
+        blob_sha: 'bd4347cdb3324de44aafd6b21516fd0cc7a9f434',
+      },
+      typescript_node: {
+        path: 'clients/typescript/package.json',
+        blob_sha: 'f61343ab03df0c207e2190917015b6fe7ece84d6',
+      },
+      typescript_runtime_adapters: {
+        deno: 'unverified',
+        bun: 'unverified',
+        edge: 'unverified',
+      },
+    },
     lanes: FIXED_LANE_READINESS.map(([id, zed_target, manifest_observed]) => ({
       id, zed_target, manifest_observed, oci_image_digest: null,
       native_test_status: 'blocked',
