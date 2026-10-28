@@ -108,7 +108,7 @@ export function validateLaneReadiness(raw) {
     })),
   };
   assert.deepEqual(actual, expected, 'source-free readiness must not claim native execution or image approval');
-  assert.equal(raw, JSON.stringify(actual, null, 2) + '\\n', 'canonical readiness JSON required');
+  assert.equal(raw, JSON.stringify(actual, null, 2) + '\n', 'canonical readiness JSON required');
   assert.deepEqual(actual.lanes.map(x => x.id), EXPECTED_LANES, 'exact matrix lane identity/order');
   return { lane_count: actual.lanes.length, unverified: actual.lanes.filter(x => !x.manifest_observed).map(x => x.id) };
 }
