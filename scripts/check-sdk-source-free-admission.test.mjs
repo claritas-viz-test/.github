@@ -75,7 +75,7 @@ test('all 18 lane readiness records remain explicitly blocked', () => {
   const summary = validateLaneReadiness(readiness);
   assert.equal(summary.lane_count, 18);
   assert.deepEqual(summary.unverified, [
-    'ruby', 'typescript-deno', 'typescript-bun', 'typescript-edge',
+    'typescript-deno', 'typescript-bun', 'typescript-edge',
   ]);
 });
 
@@ -94,7 +94,7 @@ test('missing/duplicate/extra/reordered lanes and falsified manifests are denied
     x => { x.lanes.pop(); },
     x => { x.lanes[1] = x.lanes[0]; },
     x => { x.lanes.reverse(); },
-    x => { x.lanes[8].manifest_observed = true; },
+    x => { x.lanes[8].manifest_observed = false; },
     x => { x.lanes[0].zed_target = 'wrong-target'; },
     x => { x.lanes[0].invented = true; },
     x => { x.source_commit = 'main'; },
@@ -106,4 +106,16 @@ test('noncanonical and duplicate-key readiness files are denied', () => {
   assert.throws(() => validateLaneReadiness(readiness.replace(
     '"source_commit":', '"source_commit": "moving-main",\n  "source_commit":'
   )));
+});
+
+test('exact pinned Ruby and shared TypeScript manifest observations cannot be forged', () => {
+  for (const change of [
+    x => { x.manifest_spot_checks.ruby.path = 'clients/ruby/unknown.gemspec'; },
+    x => { x.manifest_spot_checks.ruby.blob_sha = '0'.repeat(40); },
+    x => { x.manifest_spot_checks.typescript_node.blob_sha = 'f'.repeat(40); },
+    x => { x.manifest_spot_checks.typescript_runtime_adapters.deno = 'verified'; },
+    x => { x.manifest_spot_checks.typescript_runtime_adapters.bun = 'native_pass'; },
+    x => { x.manifest_spot_checks.typescript_runtime_adapters.edge = 'supported'; },
+    x => { delete x.manifest_spot_checks.ruby; },
+  ]) assert.throws(() => validateLaneReadiness(alteredReadiness(change)));
 });
