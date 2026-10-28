@@ -9,6 +9,7 @@ on:
       - '.github/workflows/polyglot-sdk-consumer-matrix.yml'
       - 'ci/sdk-source-free-admission.json'
       - 'ci/sdk-lane-readiness.json'
+      - 'ci/sdk-native-coverage-plan.json'
       - 'scripts/check-sdk-source-free-admission.mjs'
       - 'scripts/check-sdk-source-free-admission.test.mjs'
   workflow_dispatch:
@@ -39,6 +40,20 @@ jobs:
         run: node --test scripts/check-sdk-source-free-admission.test.mjs
       - name: Validate immutable metadata snapshot and no private checkout
         run: node scripts/check-sdk-source-free-admission.mjs --check
+      - name: Prove a private SDK execution request is denied
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          result="$(node scripts/check-sdk-source-free-admission.mjs --require-private 2>&1)"
+          status=$?
+          set -e
+          test "$status" -ne 0 || { echo "Unexpected successful private admission"; exit 1; }
+          case "$result" in
+            *PRIVATE_SDK_SOURCE_NOT_AUTHORIZED*) echo "PRIVATE_EXECUTION_DENIED_PASS" ;;
+            *) echo "Expected denial marker missing"; exit 1 ;;
+          esac
+
 
   private-integration-denied:
     name: BLOCKED - no public private-source execution
