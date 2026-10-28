@@ -68,6 +68,51 @@ export function validatePublicWorkflow(text) {
   }
 }
 
+const FIXED_LANE_READINESS = [
+  ['gleamlang', 'gleam', true],
+  ['erlang', 'erlang', true],
+  ['elixir', 'elixir', true],
+  ['dart', 'dart', true],
+  ['rust', 'rust', true],
+  ['java', 'java', true],
+  ['golang', 'golang', true],
+  ['python3', 'python', true],
+  ['ruby', 'ruby', false],
+  ['php', 'php', true],
+  ['typescript-nodejs', 'nodejs', true],
+  ['typescript-deno', 'nodejs', false],
+  ['typescript-bun', 'nodejs', false],
+  ['typescript-edge', 'nodejs', false],
+  ['kotlin', 'kotlin', true],
+  ['swift', 'swift', true],
+  ['zig', 'zig', true],
+  ['cpp', 'cpp', true],
+];
+
+// A manifest observed via metadata is not native integration evidence.
+// Pin the exact ordered set, target correspondence and *denied* status.
+// Container image digests are deliberately absent until independently verified.
+export function validateLaneReadiness(raw) {
+  assert.equal(typeof raw, 'string');
+  assert.ok(raw.length > 0 && raw.length < 32_768, 'bounded readiness metadata');
+  const actual = JSON.parse(raw);
+  const expected = {
+    schema: 'claritas-sdk-lane-readiness-v1',
+    source_commit: PIN,
+    source_tree_verified: false,
+    private_carrier_approved: false,
+    provenance: 'source-free, metadata-only spot checks; no native tests executed',
+    lanes: FIXED_LANE_READINESS.map(([id, zed_target, manifest_observed]) => ({
+      id, zed_target, manifest_observed, oci_image_digest: null,
+      native_test_status: 'blocked',
+    })),
+  };
+  assert.deepEqual(actual, expected, 'source-free readiness must not claim native execution or image approval');
+  assert.equal(raw, JSON.stringify(actual, null, 2) + '\\n', 'canonical readiness JSON required');
+  assert.deepEqual(actual.lanes.map(x => x.id), EXPECTED_LANES, 'exact matrix lane identity/order');
+  return { lane_count: actual.lanes.length, unverified: actual.lanes.filter(x => !x.manifest_observed).map(x => x.id) };
+}
+
 // Independent private carrier/source-owner approval must be verified outside
 // this public repository. This public CI entry point is intentionally incapable
 // of authorizing itself, even if users edit a checked-in policy file.
@@ -80,7 +125,10 @@ if (invoked) {
   try {
     const manifest = readFileSync(resolve(ROOT, 'ci/sdk-source-free-admission.json'), 'utf8');
     const workflow = readFileSync(resolve(ROOT, '.github/workflows/polyglot-sdk-consumer-matrix.yml'), 'utf8');
+    const readiness = readFileSync(resolve(ROOT, 'ci/sdk-lane-readiness.json'), 'utf8');
     const summary = validateMetadata(manifest);
+    const laneSummary = validateLaneReadiness(readiness);
+    assert.equal(laneSummary.lane_count, summary.lane_count);
     validatePublicWorkflow(workflow);
     console.log('SOURCE_FREE_SDK_METADATA_PASS commit=' + summary.source_commit + ' lanes=' + summary.lane_count);
     if (process.argv.includes('--require-private')) requirePrivateIntegration();
