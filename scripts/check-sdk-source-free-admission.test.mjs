@@ -44,7 +44,6 @@ test('missing, duplicate or shuffled language lanes are denied', () => {
 });
 test('noncanonical or duplicate JSON keys are denied', () => {
   assert.throws(() => validateMetadata(original.trimEnd()));
-  assert.throws(() => validateMetadata(original.replace('"source_repo":', '"source_repo":')));
   const duplicate = original.replace('"source_repo":', '"source_repo": "malicious/private",\n  "source_repo":');
   assert.throws(() => validateMetadata(duplicate));
 });
