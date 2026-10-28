@@ -54,5 +54,25 @@
     "java",
     "kotlin",
     "swift"
+  ],
+  "source_sdk_matrix_blob": "3bb65745e2ae454b320c968a319638ac9e098713",
+  "source_sdk_matrix_targets": [
+    "c",
+    "cpp",
+    "zig",
+    "typescript",
+    "python",
+    "go",
+    "ruby",
+    "php",
+    "rust",
+    "rust-wasm",
+    "dart",
+    "gleam",
+    "erlang",
+    "elixir",
+    "java",
+    "kotlin",
+    "swift"
   ]
 }
