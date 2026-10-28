@@ -64,7 +64,7 @@
     {
       "id": "ruby",
       "zed_target": "ruby",
-      "manifest_observed": false,
+      "manifest_observed": true,
       "oci_image_digest": null,
       "native_test_status": "blocked"
     },
@@ -131,5 +131,20 @@
       "oci_image_digest": null,
       "native_test_status": "blocked"
     }
-  ]
+  ],
+  "manifest_spot_checks": {
+    "ruby": {
+      "path": "clients/ruby/claritas-client.gemspec",
+      "blob_sha": "bd4347cdb3324de44aafd6b21516fd0cc7a9f434"
+    },
+    "typescript_node": {
+      "path": "clients/typescript/package.json",
+      "blob_sha": "f61343ab03df0c207e2190917015b6fe7ece84d6"
+    },
+    "typescript_runtime_adapters": {
+      "deno": "unverified",
+      "bun": "unverified",
+      "edge": "unverified"
+    }
+  }
 }
