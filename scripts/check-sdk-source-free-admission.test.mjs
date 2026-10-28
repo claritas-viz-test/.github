@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { validateMetadata, validatePublicWorkflow, validateLaneReadiness, requirePrivateIntegration } from './check-sdk-source-free-admission.mjs';
+import { validateMetadata, validatePublicWorkflow, validateLaneReadiness, validateTargetCoverage, requirePrivateIntegration } from './check-sdk-source-free-admission.mjs';
 
 const original = readFileSync('ci/sdk-source-free-admission.json', 'utf8');
 const workflow = readFileSync('.github/workflows/polyglot-sdk-consumer-matrix.yml', 'utf8');
 const readiness = readFileSync('ci/sdk-lane-readiness.json', 'utf8');
+const coverage = readFileSync('ci/sdk-native-coverage-plan.json', 'utf8');
 function altered(change) {
   const candidate = JSON.parse(original);
   change(candidate);
@@ -135,4 +136,48 @@ test('authoritative source matrix has 17 targets, not 18 native passing test lan
     assert.ok(!metadata.source_sdk_matrix_targets.includes(runtime));
   }
   validateMetadata(original);
+});
+
+function changedCoverage(change) {
+  const item = JSON.parse(coverage);
+  change(item);
+  return JSON.stringify(item, null, 2) + '\n';
+}
+
+test('authoritative 17-target coverage records the two gaps and three unverified extra lanes', () => {
+  const report = validateTargetCoverage(coverage);
+  assert.deepEqual(report, { target_count: 17, mapped_count: 15, unmapped_count: 2, extras: 3 });
+  const item = JSON.parse(coverage);
+  assert.deepEqual(item.unmapped_source_targets, ['c', 'rust-wasm']);
+  assert.deepEqual(item.unverified_extra_lanes, ['typescript-deno', 'typescript-bun', 'typescript-edge']);
+});
+
+test('target coverage cannot claim native integration or approved carrier', () => {
+  for (const change of [
+    x => { x.private_carrier_approved = true; },
+    x => { x.source_tree_verified = true; },
+    x => { x.targets[0].native_test_status = 'success'; },
+    x => { x.targets[0].ci_lane = 'cpp'; },
+    x => { x.targets[9].ci_lane = 'rust'; },
+    x => { x.targets[3].ci_lane = 'typescript-deno'; },
+    x => { x.unverified_extra_lanes.pop(); },
+    x => { x.unmapped_source_targets = []; },
+  ]) assert.throws(() => validateTargetCoverage(changedCoverage(change)));
+});
+
+test('coverage denies duplicate, omitted, reordered or tampered SDK targets', () => {
+  for (const change of [
+    x => { x.targets.pop(); },
+    x => { x.targets.push(x.targets[0]); },
+    x => { x.targets.reverse(); },
+    x => { x.source_sdk_matrix_blob = '0'.repeat(40); },
+    x => { x.source_commit = 'main'; },
+  ]) assert.throws(() => validateTargetCoverage(changedCoverage(change)));
+});
+
+test('coverage rejects noncanonical or duplicate-key JSON', () => {
+  assert.throws(() => validateTargetCoverage(coverage.trimEnd()));
+  assert.throws(() => validateTargetCoverage(coverage.replace(
+    '"source_commit":', '"source_commit": "main",\n  "source_commit":'
+  )));
 });
