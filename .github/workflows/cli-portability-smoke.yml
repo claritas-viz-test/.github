@@ -82,7 +82,7 @@ jobs:
           package-manager-cache: false
       - name: Install committed dependencies
         working-directory: fixtures/node-cli
-        run: npm ci
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Check Node CLI formatting
         working-directory: fixtures/node-cli
         run: npm run format:check
