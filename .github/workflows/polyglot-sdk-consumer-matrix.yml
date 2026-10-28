@@ -1,6 +1,15 @@
-name: Polyglot SDK consumer matrix
+name: Claritas SDK source-free admission
 
+# Private SDK source is NEVER checked out in this public repository.
+# An independently approved PRIVATE exact-tree carrier must perform all
+# actual native language tests. This workflow validates metadata only.
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/polyglot-sdk-consumer-matrix.yml'
+      - 'ci/sdk-source-free-admission.json'
+      - 'scripts/check-sdk-source-free-admission.mjs'
+      - 'scripts/check-sdk-source-free-admission.test.mjs'
   workflow_dispatch:
   repository_dispatch:
     types: [clients-repository-ready, clients-updated]
@@ -9,12 +18,37 @@ permissions:
   contents: read
 
 jobs:
-  sdk-clients:
-    uses: zed-pkg-test/.github/.github/workflows/sdk-client-language-matrix.yml@df3eed96202810b7e7d6667fabc3041b19e6a22f
-    with:
-      clients_repository: claritas-viz/claritas-clients
-      # Immutable upstream revision, not a moving branch; update only after reviewing source contracts.
-      clients_ref: ef8dc3e71eabae9c23058ed08162f7af10c38c00
-      clients_root: clients
-    secrets:
-      read_token: ${{ secrets.TEST_ORG_READ_TOKEN }}
+  source-free-contract:
+    name: Source-free SDK metadata contract (NOT integration)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out this public test repository without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          show-progress: false
+          submodules: false
+      - name: Set up Node.js for dependency-free metadata tests
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Execute positive and negative source-free admission tests
+        run: node --test scripts/check-sdk-source-free-admission.test.mjs
+      - name: Validate immutable metadata snapshot and no private checkout
+        run: node scripts/check-sdk-source-free-admission.mjs --check
+
+  private-integration-denied:
+    name: BLOCKED - no public private-source execution
+    if: github.event_name != 'pull_request'
+    needs: source-free-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: false
+      - name: Deny without independently approved private exact-tree carrier
+        run: node scripts/check-sdk-source-free-admission.mjs --require-private
