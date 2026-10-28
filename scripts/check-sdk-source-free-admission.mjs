@@ -131,6 +131,50 @@ export function validateLaneReadiness(raw) {
   return { lane_count: actual.lanes.length, unverified: actual.lanes.filter(x => !x.manifest_observed).map(x => x.id) };
 }
 
+const TARGET_TO_LANE = [
+  ['c', null],
+  ['cpp', 'cpp'],
+  ['zig', 'zig'],
+  ['typescript', 'typescript-nodejs'],
+  ['python', 'python3'],
+  ['go', 'golang'],
+  ['ruby', 'ruby'],
+  ['php', 'php'],
+  ['rust', 'rust'],
+  ['rust-wasm', null],
+  ['dart', 'dart'],
+  ['gleam', 'gleamlang'],
+  ['erlang', 'erlang'],
+  ['elixir', 'elixir'],
+  ['java', 'java'],
+  ['kotlin', 'kotlin'],
+  ['swift', 'swift'],
+];
+
+export function validateTargetCoverage(raw) {
+  assert.equal(typeof raw, 'string');
+  assert.ok(raw.length > 0 && raw.length < 32_768, 'bounded target coverage');
+  const actual = JSON.parse(raw);
+  const expected = {
+    schema: 'claritas-sdk-native-coverage-plan-v1',
+    source_commit: PIN,
+    source_sdk_matrix_blob: '3bb65745e2ae454b320c968a319638ac9e098713',
+    source_tree_verified: false,
+    private_carrier_approved: false,
+    targets: TARGET_TO_LANE.map(([source_target, ci_lane]) => ({
+      source_target, ci_lane, native_test_status: 'blocked',
+    })),
+    unverified_extra_lanes: ['typescript-deno', 'typescript-bun', 'typescript-edge'],
+    unmapped_source_targets: ['c', 'rust-wasm'],
+    scope: 'metadata-only planning; no private source was mirrored or native SDK tests executed',
+  };
+  assert.deepEqual(actual, expected, 'target coverage cannot invent or silently skip SDK integrations');
+  assert.equal(raw, JSON.stringify(actual, null, 2) + '\n', 'canonical target plan required');
+  assert.equal(new Set(actual.targets.map(x => x.source_target)).size, 17);
+  assert.equal(new Set(actual.targets.map(x => x.ci_lane).filter(Boolean)).size, 15);
+  return { target_count: 17, mapped_count: 15, unmapped_count: 2, extras: 3 };
+}
+
 // Independent private carrier/source-owner approval must be verified outside
 // this public repository. This public CI entry point is intentionally incapable
 // of authorizing itself, even if users edit a checked-in policy file.
@@ -144,8 +188,12 @@ if (invoked) {
     const manifest = readFileSync(resolve(ROOT, 'ci/sdk-source-free-admission.json'), 'utf8');
     const workflow = readFileSync(resolve(ROOT, '.github/workflows/polyglot-sdk-consumer-matrix.yml'), 'utf8');
     const readiness = readFileSync(resolve(ROOT, 'ci/sdk-lane-readiness.json'), 'utf8');
+    const coverage = readFileSync(resolve(ROOT, 'ci/sdk-native-coverage-plan.json'), 'utf8');
     const summary = validateMetadata(manifest);
     const laneSummary = validateLaneReadiness(readiness);
+    const targetSummary = validateTargetCoverage(coverage);
+    assert.equal(targetSummary.target_count, 17);
+    assert.equal(targetSummary.mapped_count + targetSummary.unmapped_count, 17);
     assert.equal(laneSummary.lane_count, summary.lane_count);
     validatePublicWorkflow(workflow);
     console.log('SOURCE_FREE_SDK_METADATA_PASS commit=' + summary.source_commit + ' lanes=' + summary.lane_count);
