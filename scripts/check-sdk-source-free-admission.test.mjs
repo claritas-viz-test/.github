@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { validateMetadata, validatePublicWorkflow, requirePrivateIntegration } from './check-sdk-source-free-admission.mjs';
+import { validateMetadata, validatePublicWorkflow, validateLaneReadiness, requirePrivateIntegration } from './check-sdk-source-free-admission.mjs';
 
 const original = readFileSync('ci/sdk-source-free-admission.json', 'utf8');
 const workflow = readFileSync('.github/workflows/polyglot-sdk-consumer-matrix.yml', 'utf8');
+const readiness = readFileSync('ci/sdk-lane-readiness.json', 'utf8');
 function altered(change) {
   const candidate = JSON.parse(original);
   change(candidate);
@@ -62,4 +63,47 @@ test('private checkout tokens and remote reusable actions are denied', () => {
 test('public-workflow execution cannot be authorized by any checked-in metadata', () => {
   assert.throws(() => validateMetadata(altered(x => { x.carrier_authorized = true; })));
   assert.throws(requirePrivateIntegration, /PRIVATE_SDK_SOURCE_NOT_AUTHORIZED/);
+});
+
+function alteredReadiness(change) {
+  const candidate = JSON.parse(readiness);
+  change(candidate);
+  return JSON.stringify(candidate, null, 2) + '\n';
+}
+
+test('all 18 lane readiness records remain explicitly blocked', () => {
+  const summary = validateLaneReadiness(readiness);
+  assert.equal(summary.lane_count, 18);
+  assert.deepEqual(summary.unverified, [
+    'ruby', 'typescript-deno', 'typescript-bun', 'typescript-edge',
+  ]);
+});
+
+test('no lane can claim an OCI digest, native pass or private carrier approval', () => {
+  for (const change of [
+    x => { x.lanes[0].native_test_status = 'success'; },
+    x => { x.lanes[3].oci_image_digest = 'ubuntu@sha256:' + 'f'.repeat(64); },
+    x => { x.source_tree_verified = true; },
+    x => { x.private_carrier_approved = true; },
+    x => { x.provenance = 'tests executed'; },
+  ]) assert.throws(() => validateLaneReadiness(alteredReadiness(change)));
+});
+
+test('missing/duplicate/extra/reordered lanes and falsified manifests are denied', () => {
+  for (const change of [
+    x => { x.lanes.pop(); },
+    x => { x.lanes[1] = x.lanes[0]; },
+    x => { x.lanes.reverse(); },
+    x => { x.lanes[8].manifest_observed = true; },
+    x => { x.lanes[0].zed_target = 'wrong-target'; },
+    x => { x.lanes[0].invented = true; },
+    x => { x.source_commit = 'main'; },
+  ]) assert.throws(() => validateLaneReadiness(alteredReadiness(change)));
+});
+
+test('noncanonical and duplicate-key readiness files are denied', () => {
+  assert.throws(() => validateLaneReadiness(readiness.trimEnd()));
+  assert.throws(() => validateLaneReadiness(readiness.replace(
+    '"source_commit":', '"source_commit": "moving-main",\n  "source_commit":'
+  )));
 });
