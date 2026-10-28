@@ -29,6 +29,8 @@ const EXPECTED = {
   container_digests_verified: false,
   source_execution: 'denied',
   notes: 'Metadata only. Never place source content, secrets, or reviewed admission receipts in this public repo.',
+  source_root_manifest_blob: '169f3cb02ffe1eb8d9a2d1606abf681231360885',
+  source_zed_targets: ['rust', 'c', 'cpp', 'zig', 'nodejs', 'python', 'golang', 'ruby', 'php', 'rust-wasm', 'dart', 'gleam', 'erlang', 'elixir', 'java', 'kotlin', 'swift'],
 };
 
 // This manifest is an audited *metadata snapshot*, not private-source admission.
