@@ -1,0 +1,104 @@
+{
+  "schema": "claritas-sdk-native-coverage-plan-v1",
+  "source_commit": "ef8dc3e71eabae9c23058ed08162f7af10c38c00",
+  "source_sdk_matrix_blob": "3bb65745e2ae454b320c968a319638ac9e098713",
+  "source_tree_verified": false,
+  "private_carrier_approved": false,
+  "targets": [
+    {
+      "source_target": "c",
+      "ci_lane": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "cpp",
+      "ci_lane": "cpp",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "zig",
+      "ci_lane": "zig",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "typescript",
+      "ci_lane": "typescript-nodejs",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "python",
+      "ci_lane": "python3",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "go",
+      "ci_lane": "golang",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "ruby",
+      "ci_lane": "ruby",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "php",
+      "ci_lane": "php",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "rust",
+      "ci_lane": "rust",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "rust-wasm",
+      "ci_lane": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "dart",
+      "ci_lane": "dart",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "gleam",
+      "ci_lane": "gleamlang",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "erlang",
+      "ci_lane": "erlang",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "elixir",
+      "ci_lane": "elixir",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "java",
+      "ci_lane": "java",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "kotlin",
+      "ci_lane": "kotlin",
+      "native_test_status": "blocked"
+    },
+    {
+      "source_target": "swift",
+      "ci_lane": "swift",
+      "native_test_status": "blocked"
+    }
+  ],
+  "unverified_extra_lanes": [
+    "typescript-deno",
+    "typescript-bun",
+    "typescript-edge"
+  ],
+  "unmapped_source_targets": [
+    "c",
+    "rust-wasm"
+  ],
+  "scope": "metadata-only planning; no private source was mirrored or native SDK tests executed"
+}
