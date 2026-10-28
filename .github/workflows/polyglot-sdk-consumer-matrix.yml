@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/polyglot-sdk-consumer-matrix.yml'
       - 'ci/sdk-source-free-admission.json'
+      - 'ci/sdk-lane-readiness.json'
       - 'scripts/check-sdk-source-free-admission.mjs'
       - 'scripts/check-sdk-source-free-admission.test.mjs'
   workflow_dispatch:
