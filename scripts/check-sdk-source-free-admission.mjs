@@ -42,10 +42,11 @@ export function validateMetadata(raw) {
   const actual = JSON.parse(raw);
   assert.deepEqual(actual, EXPECTED, 'unexpected SDK source metadata, pins, lanes, or denied state');
   assert.equal(raw, JSON.stringify(actual, null, 2) + '\n', 'policy must be canonical JSON with no duplicate keys');
-  for (const id of [actual.source_commit, actual.reusable_workflow_commit, actual.reusable_workflow_blob]) {
+  for (const id of [actual.source_commit, actual.reusable_workflow_commit, actual.reusable_workflow_blob, actual.source_root_manifest_blob]) {
     assert.match(id, SHA, 'only immutable Git SHAs allowed');
   }
   assert.equal(new Set(actual.expected_language_lanes).size, 18, 'exactly eighteen distinct lanes');
+  assert.equal(new Set(actual.source_zed_targets).size, 17, 'exactly seventeen pinned Zed target labels; 18 CI matrix lanes are not equivalent to 17 package targets');
   return { source_commit: actual.source_commit, lane_count: actual.expected_language_lanes.length };
 }
 
