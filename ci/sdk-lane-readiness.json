@@ -1,0 +1,135 @@
+{
+  "schema": "claritas-sdk-lane-readiness-v1",
+  "source_commit": "ef8dc3e71eabae9c23058ed08162f7af10c38c00",
+  "source_tree_verified": false,
+  "private_carrier_approved": false,
+  "provenance": "source-free, metadata-only spot checks; no native tests executed",
+  "lanes": [
+    {
+      "id": "gleamlang",
+      "zed_target": "gleam",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "erlang",
+      "zed_target": "erlang",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "elixir",
+      "zed_target": "elixir",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "dart",
+      "zed_target": "dart",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "rust",
+      "zed_target": "rust",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "java",
+      "zed_target": "java",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "golang",
+      "zed_target": "golang",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "python3",
+      "zed_target": "python",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "ruby",
+      "zed_target": "ruby",
+      "manifest_observed": false,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "php",
+      "zed_target": "php",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "typescript-nodejs",
+      "zed_target": "nodejs",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "typescript-deno",
+      "zed_target": "nodejs",
+      "manifest_observed": false,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "typescript-bun",
+      "zed_target": "nodejs",
+      "manifest_observed": false,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "typescript-edge",
+      "zed_target": "nodejs",
+      "manifest_observed": false,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "kotlin",
+      "zed_target": "kotlin",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "swift",
+      "zed_target": "swift",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "zig",
+      "zed_target": "zig",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    },
+    {
+      "id": "cpp",
+      "zed_target": "cpp",
+      "manifest_observed": true,
+      "oci_image_digest": null,
+      "native_test_status": "blocked"
+    }
+  ]
+}
