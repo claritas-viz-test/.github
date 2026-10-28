@@ -1,0 +1,38 @@
+{
+  "schema": "claritas-sdk-source-free-admission-v1",
+  "source_repo": "claritas-viz/claritas-clients",
+  "source_repo_id": 1346385887,
+  "source_commit": "ef8dc3e71eabae9c23058ed08162f7af10c38c00",
+  "source_visibility": "private",
+  "test_org": "claritas-viz-test",
+  "reusable_workflow_repo": "zed-pkg-test/.github",
+  "reusable_workflow_commit": "df3eed96202810b7e7d6667fabc3041b19e6a22f",
+  "reusable_workflow_blob": "6c6f29c754df3842850d9fc873df0347ac3a4fc5",
+  "expected_language_lanes": [
+    "gleamlang",
+    "erlang",
+    "elixir",
+    "dart",
+    "rust",
+    "java",
+    "golang",
+    "python3",
+    "ruby",
+    "php",
+    "typescript-nodejs",
+    "typescript-deno",
+    "typescript-bun",
+    "typescript-edge",
+    "kotlin",
+    "swift",
+    "zig",
+    "cpp"
+  ],
+  "dependencies": [
+    "claritas-viz/claritas-interfaces"
+  ],
+  "carrier_authorized": false,
+  "container_digests_verified": false,
+  "source_execution": "denied",
+  "notes": "Metadata only. Never place source content, secrets, or reviewed admission receipts in this public repo."
+}
