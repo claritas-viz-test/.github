@@ -29,6 +29,10 @@ test('changed source identity, dependency, carrier or image authorization is den
     x => { x.source_repo = 'attacker/private'; },
     x => { x.dependencies = []; },
     x => { x.source_root_manifest_blob = 'f'.repeat(40); },
+    x => { x.source_sdk_matrix_blob = 'f'.repeat(40); },
+    x => { x.source_sdk_matrix_targets.pop(); },
+    x => { x.source_sdk_matrix_targets.reverse(); },
+    x => { x.source_sdk_matrix_targets[3] = 'typescript-bun'; },
     x => { x.source_zed_targets.pop(); },
     x => { x.source_zed_targets.reverse(); },
     x => { x.carrier_authorized = true; },
@@ -118,4 +122,17 @@ test('exact pinned Ruby and shared TypeScript manifest observations cannot be fo
     x => { x.manifest_spot_checks.typescript_runtime_adapters.edge = 'supported'; },
     x => { delete x.manifest_spot_checks.ruby; },
   ]) assert.throws(() => validateLaneReadiness(alteredReadiness(change)));
+});
+
+test('authoritative source matrix has 17 targets, not 18 native passing test lanes', () => {
+  const metadata = JSON.parse(original);
+  assert.equal(metadata.source_sdk_matrix_targets.length, 17);
+  assert.equal(metadata.expected_language_lanes.length, 18);
+  assert.ok(metadata.source_sdk_matrix_targets.includes('c'));
+  assert.ok(metadata.source_sdk_matrix_targets.includes('rust-wasm'));
+  assert.ok(metadata.source_sdk_matrix_targets.includes('typescript'));
+  for (const runtime of ['typescript-deno', 'typescript-bun', 'typescript-edge']) {
+    assert.ok(!metadata.source_sdk_matrix_targets.includes(runtime));
+  }
+  validateMetadata(original);
 });
