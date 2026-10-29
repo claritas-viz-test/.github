@@ -1,0 +1,5 @@
+# Keep canonical agent-policy files byte-identical on Linux, macOS and Windows.
+# The reusable CLI portability workflow correctly rejects tracked-source drift;
+# do not weaken that gate to accommodate platform-dependent line endings.
+/AGENTS.md text eol=lf
+/agents.md text eol=lf
